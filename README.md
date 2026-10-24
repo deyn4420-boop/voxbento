@@ -101,7 +101,9 @@ uv sync --all-groups
 
 ### 3. Configure Environment
 
-Copy the example environment configuration and generate the required encryption key:
+Copy the example environment configuration and generate the required encryption key. The key encrypts stored provider keys and every queued email (sign-in links, invitations, password resets), so production refuses to start without it. Outgoing email is sent from a durable outbox once `SMTP_HOST` is set; Admins edit the email templates and see delivery status in **Admin → Emails**.
+
+Email branding defaults to the VoxBento V mark with a transparent background, suitable for light and dark backgrounds. Leave the logo address empty in **Admin → Emails → Branding** to use it. The SVG source is `portal/static/img/email-mark.svg`; emails use its high-resolution transparent PNG export for mail-client compatibility. Set `PUBLIC_BASE_URL` to your publicly reachable HTTPS portal URL so recipients can load the image; browser previews load the bundled image from the current site. Custom HTTPS logo images and hiding the logo are still supported. Mail apps that block images may show the VoxBento alternative text until the recipient enables images.
 
 ```bash
 cp .env.example .env
@@ -112,6 +114,12 @@ env = re.sub(r'API_KEY_ENCRYPTION_KEY=.*', f'API_KEY_ENCRYPTION_KEY={secrets.tok
 open('.env', 'w').write(env)
 "
 ```
+
+For self-hosted domains, set `PUBLIC_BASE_URL` in `.env` to your public URL, for
+example `PUBLIC_BASE_URL=https://interpret.example.com`. It defaults to
+`https://voxbento.com` and is used for email links and canonical URLs in
+`/sitemap.xml`. Sitemap URL generation accepts trailing slashes and preserves any
+configured path prefix.
 
 ### 4. Run the Stack
 
